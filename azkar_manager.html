@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الأذكار</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* الخطوط والألوان الأساسية */
+        :root {
+            --primary-color: #4CAF50; /* أخضر */
+            --secondary-color: #388E3C; /* أخضر داكن */
+            --text-color: #343a40; /* رمادي داكن للنص */
+            --border-color: #dee2e6; /* لون الحدود */
+            --delete-color: #dc3545; /* أحمر للحذف */
+            --copy-share-color: #007bff; /* أزرق للنسخ والمشاركة */
+            --shadow-light: rgba(0, 0, 0, 0.08); /* ظل خفيف */
+        }
+
+        body {
+            font-family: 'Amiri', serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: right;
+            line-height: 1.8;
+
+            /* خصائص خلفية المسجد لكامل الصفحة */
+            background-image: url('https://i.postimg.cc/bNb16L6F/16775268560.webp'); /* رابط الصورة المباشر */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        /* حاويات الأقسام (الإطارات الداخلية) */
+        .container {
+            /* سنستخدم نفس الصورة كخلفية هنا أيضًا */
+            background-image: url('https://i.postimg.cc/bNb16L6F/16775268560.webp');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px var(--shadow-light);
+            width: 100%;
+            max-width: 650px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+
+            /* تأثير الضبابية لجعل النص أوضح فوق الصورة */
+            backdrop-filter: blur(5px);
+            background-color: rgba(0, 0, 0, 0.3); /* طبقة شفافة سوداء خفيفة جداً لتحسين تباين النص */
+            background-blend-mode: overlay;
+        }
+
+        h1, h2 {
+            font-family: 'Amiri', serif;
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        label {
+            font-family: 'Amiri', serif;
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: white;
+            font-size: 1.05em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        input[type="text"],
+        textarea {
+            font-family: 'Amiri', serif;
+            width: calc(100% - 22px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 17px;
+            box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.95);
+            color: var(--text-color);
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        button {
+            font-family: 'Amiri', serif;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+        }
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #azkarList {
+            margin-top: 20px;
+        }
+        .zikr-item {
+            font-family: 'Amiri', serif;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #d4edda;
+            box-shadow: 0 2px 8px var(--shadow-light);
+            color: var(--text-color);
+        }
+        .zikr-item h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+            font-size: 1.3em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .zikr-item p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: #555;
+        }
+        .zikr-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+        .zikr-actions button {
+            font-family: 'Amiri', serif;
+            width: auto;
+            padding: 8px 15px;
+            font-size: 0.95em;
+            margin-top: 0;
+            border-radius: 6px;
+        }
+        .zikr-actions .copy-btn {
+            background-color: var(--copy-share-color);
+        }
+        .zikr-actions .copy-btn:hover {
+            background-color: #0056b3;
+        }
+        .zikr-actions .share-btn {
+            background-color: #20c997;
+        }
+        .zikr-actions .share-btn:hover {
+            background-color: #17a2b8;
+        }
+        .zikr-actions .delete-btn {
+            background-color: var(--delete-color);
+        }
+        .zikr-actions .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .status-message {
+            font-family: 'Amiri', serif;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .status-message.info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .status-message.success {
+            background-color: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+        }
+        .status-message.warning {
+            background-color: #ffeeba;
+            border: 1px solid #ffc107;
+            color: #856404;
+        }
+
+        .empty-state {
+            font-family: 'Amiri', serif;
+            text-align: center;
+            color: #777;
+            font-size: 1.1em;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 20px; margin-bottom: 15px; border-radius: 10px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+            input[type="text"], textarea { font-size: 15px; padding: 10px; width: calc(100% - 20px); }
+            button { font-size: 15px; padding: 10px 15px; }
+            .zikr-item h3 { font-size: 1.2em; flex-direction: column; align-items: flex-start; }
+            .zikr-item p { font-size: 1em; }
+            .zikr-actions { flex-direction: column; gap: 8px; margin-top: 10px; width: 100%; }
+            .zikr-actions button { width: 100%; padding: 10px; }
+            .status-message { font-size: 1em; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>إدارة الأذكار</h1>
+        <div id="statusMessage" class="status-message"></div>
+
+        <h2>أضف ذكرًا جديدًا</h2>
+        <label for="zikrTitle">عنوان الذكر:</label>
+        <input type="text" id="zikrTitle" placeholder="مثال: أذكار الصباح، دعاء الاستخارة...">
+
+        <label for="zikrText">نص الذكر:</label>
+        <textarea id="zikrText" rows="4" placeholder="اكتب نص الذكر هنا..."></textarea>
+        <button onclick="addZikr()">أضف الذكر</button>
+    </div>
+
+    <div class="container">
+        <h2>أذكارك المسجلة</h2>
+        <div id="azkarList">
+            <p class="empty-state">لا توجد أذكار مسجلة بعد. أضف ذكرًا لتبدأ!</p>
+        </div>
+    </div>
+
+    <script>
+        const zikrTitleInput = document.getElementById('zikrTitle');
+        const zikrTextInput = document.getElementById('zikrText');
+        const azkarListDiv = document.getElementById('azkarList');
+        const statusMessageDiv = document.getElementById('statusMessage');
+
+        let azkar = [];
+
+        function loadAzkar() {
+            const storedAzkar = localStorage.getItem('myAzkarPro');
+            if (storedAzkar) {
+                azkar = JSON.parse(storedAzkar);
+            }
+            displayAzkar();
+        }
+
+        function saveAzkar() {
+            localStorage.setItem('myAzkarPro', JSON.stringify(azkar));
+        }
+
+        function displayAzkar() {
+            azkarListDiv.innerHTML = '';
+            if (azkar.length === 0) {
+                azkarListDiv.innerHTML = '<p class="empty-state">لا توجد أذكار مسجلة بعد. أضف ذكرًا لتبدأ!</p>';
+                return;
+            }
+            azkar.forEach((zikr, index) => {
+                const zikrItem = document.createElement('div');
+                zikrItem.classList.add('zikr-item');
+                zikrItem.innerHTML = `
+                    <h3>${zikr.title}</h3>
+                    <p>${zikr.text}</p>
+                    <div class="zikr-actions">
+                        <button class="copy-btn" onclick="copyZikr(${index})">نسخ</button>
+                        <button class="share-btn" onclick="shareZikr(${index})">مشاركة</button>
+                        <button class="delete-btn" onclick="deleteZikr(${index})">حذف</button>
+                    </div>
+                `;
+                azkarListDiv.appendChild(zikrItem);
+            });
+        }
+
+        function addZikr() {
+            const title = zikrTitleInput.value.trim();
+            const text = zikrTextInput.value.trim();
+
+            if (title && text) {
+                azkar.push({ title: title, text: text });
+                zikrTitleInput.value = '';
+                zikrTextInput.value = '';
+                saveAzkar();
+                displayAzkar();
+                showStatus('تم إضافة الذكر بنجاح!', 'success');
+            } else {
+                showStatus('الرجاء إدخال عنوان ونص الذكر.', 'warning');
+            }
+        }
+
+        function deleteZikr(index) {
+            if (confirm(`هل أنت متأكد أنك تريد حذف الذكر "${azkar[index].title}"؟`)) {
+                azkar.splice(index, 1);
+                saveAzkar();
+                displayAzkar();
+                showStatus('تم حذف الذكر بنجاح.', 'info');
+            }
+        }
+
+        function copyZikr(index) {
+            const zikrToCopy = azkar[index];
+            const textToCopy = `${zikrToCopy.title}\n\n${zikrToCopy.text}`;
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    showStatus('تم نسخ الذكر إلى الحافظة!', 'success');
+                })
+                .catch(err => {
+                    console.error('فشل في النسخ:', err);
+                    showStatus('فشل في نسخ الذكر. يرجى النسخ يدويًا.', 'warning');
+                });
+        }
+
+        function shareZikr(index) {
+            const zikrToShare = azkar[index];
+            const shareText = `${zikrToShare.title}\n\n${zikrToShare.text}\n\nمن برنامج الأذكار الخاص بي!`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: zikrToShare.title,
+                    text: shareText,
+                    url: window.location.href
+                })
+                .then(() => {
+                    showStatus('تم مشاركة الذكر بنجاح!', 'success');
+                })
+                .catch((error) => {
+                    console.error('فشل المشاركة:', error);
+                    showStatus('فشل في مشاركة الذكر.', 'warning');
+                });
+            } else {
+                showStatus('متصفحك لا يدعم المشاركة المباشرة. يرجى النسخ يدويًا.', 'info');
+                copyZikr(index);
+            }
+        }
+
+        function showStatus(message, type) {
+            statusMessageDiv.textContent = message;
+            statusMessageDiv.className = 'status-message';
+            if (type) {
+                statusMessageDiv.classList.add(type);
+            }
+            statusMessageDiv.style.display = 'block';
+            setTimeout(() => {
+                statusMessageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        window.onload = loadAzkar;
+    </script>
+</body>
+</html>
